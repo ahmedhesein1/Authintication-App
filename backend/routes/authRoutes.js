@@ -7,10 +7,10 @@ const router = express.Router();
 // router.get("/check-auth", verifyToken, checkAuth);
 
 router.post("/signup", authControl.signup);
-// router.post("/login", login);
+router.post("/login", authControl.login);
 // router.post("/logout", logout);
 
-// router.post("/verify-email", verifyEmail);
+router.post("/verify-email", authControl.verifyEmail);
 // router.post("/forgot-password", forgotPassword);
 
 // router.post("/reset-password/:token", resetPassword);
