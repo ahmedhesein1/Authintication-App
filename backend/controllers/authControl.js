@@ -5,7 +5,36 @@ import User from "../models/userModel.js";
 import AppError from "../utils/AppError.js";
 import jwt from "jsonwebtoken";
 import { generateVerificationCode } from "../utils/generateVerificationCode.js";
-import { sendVerificationEmail, sendWelcomeEmail } from "../mailtrap/emails.js";
+import {
+  sendVerificationEmail,
+  sendWelcomeEmail,
+  sendResetPasswordEmail,
+  sendSuccessEmail,
+} from "../mailtrap/emails.js";
+export const protect = asyncHandler(async (req, res, next) => {
+  const token = req.cookies.token;
+  if (!token) {
+    return next(new AppError("You Are Not authorized", 401));
+  }
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const user = await User.findById(decoded.id);
+  if (!user) {
+    return next(new AppError("User not found", 404));
+  }
+  req.id = decoded.id;
+  decoded ? next() : next(new AppError("Authorization failed"));
+});
+export const checkAuth = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.id);
+  if (!user) {
+    return next(new AppError("User not found", 404));
+  }
+  res.status(200).json({
+    success: true,
+    ...user._doc,
+    password: undefined,
+  })
+});
 export const signup = asyncHandler(async (req, res, next) => {
   const { name, email, password } = req.body;
 
@@ -66,7 +95,7 @@ export const login = asyncHandler(async (req, res, next) => {
     return next(new AppError("Email or Password Is Not Correct", 400));
   }
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "90d ",
+    expiresIn: "90d",
   });
   user.lastLogin = new Date();
   res
@@ -97,5 +126,40 @@ export const forgotPassword = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new AppError("User not found", 400));
   }
-  
+  const resetToken = crypto.randomBytes(20).toString("hex");
+  const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000;
+  user.resetPasswordToken = resetToken;
+  user.resetPasswordExpiresAt = resetTokenExpiresAt;
+  await user.save();
+  await sendResetPasswordEmail(
+    user.email,
+    `${process.env.CLIENT_URL}/reset-password/${resetToken}`
+  );
+  res.status(200).json({
+    success: true,
+    message: "Reset password link sent successfully",
+  });
+  next();
+});
+export const resetPassword = asyncHandler(async (req, res, next) => {
+  const { token } = req.params;
+  const { password } = req.body;
+  const user = await User.findOne({
+    resetPasswordToken: token,
+    resetPasswordExpiresAt: { $gt: Date.now() },
+  });
+  if (!user) {
+    return next(new AppError("Invalid Or Expired Token", 400));
+  }
+  const hashedPassword = await bcrypt.hash(password, 10);
+  user.password = hashedPassword;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpiresAt = undefined;
+  await user.save();
+  await sendSuccessEmail(user.email);
+  res.status(200).json({
+    success: true,
+    message: "Password reset successfully",
+  });
+  next();
 });
