@@ -122,4 +122,3 @@ Please follow the [Code of Conduct](CODE_OF_CONDUCT.md) and ensure your code pas
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-```
