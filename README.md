@@ -26,8 +26,7 @@ This is a Node.js-based authentication app that provides essential features such
     bash
 
 
-    `git clone https://github.com/ahmedhesein1/Authintication-App.git
-    cd backend`
+    `git clone https://github.com/ahmedhesein1/Authintication-App.git`
 
 3.  Install dependencies:
 
