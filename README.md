@@ -93,32 +93,6 @@ curl -X POST http://localhost:3000/api/auth/signup \
 }
 ```
 
-## Frontend Integration
-
-This project provides a backend API. You can pair it with any frontend framework (e.g., React, Vue). Update the `CLIENT_URL` in `.env` to match your frontend's URL.
-
-## Testing
-
-To test the API, use tools like [Postman](https://www.postman.com/) or [cURL](https://curl.se/). Ensure Mailtrap is configured to verify email functionality.
-
-## Contributing
-
-Contributions are welcome! To contribute:
-
-1. Fork the repository.
-2. Create a feature branch (`git checkout -b feature/your-feature`).
-3. Commit your changes (`git commit -m "Add your feature"`).
-4. Push to the branch (`git push origin feature/your-feature`).
-5. Open a pull request.
-
-Please follow the [Code of Conduct](CODE_OF_CONDUCT.md) and ensure your code passes linting (`npm run lint`).
-
-## Troubleshooting
-
-- **MongoDB connection error**: Verify MongoDB is running and the `DB` URL is correct.
-- **Emails not sending**: Check your Mailtrap token and endpoint in `.env`.
-- **Port conflict**: Change the `PORT` in `.env` if 3000 is in use.
-
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
