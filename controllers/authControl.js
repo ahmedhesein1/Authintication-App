@@ -22,7 +22,7 @@ export const protect = asyncHandler(async (req, res, next) => {
     return next(new AppError("User not found", 404));
   }
   req.id = decoded.id;
-  decoded ? next() : next(new AppError("Authorization failed"));
+  decoded ? next() : next(new AppError("Authorization failed",404));
 });
 export const checkAuth = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.id);
